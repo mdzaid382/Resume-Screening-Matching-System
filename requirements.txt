@@ -1,2 +1,20 @@
+flask
+flask-cors
+pandas
+numpy
+scikit-learn
+mlflow==2.22.0
+dagshub
+dvc[s3]
+boto3
+matplotlib
+nltk
+python-dotenv
+uvicorn
+fastapi
+waitress
+gunicorn
+prometheus_client
+
 # local package
 -e .
