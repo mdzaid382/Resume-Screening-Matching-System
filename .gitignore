@@ -225,3 +225,4 @@ data_upload_S3/ai-recruitment-pipeline-dataset.zip
 models/*
 logs/
 demo.ipynb
+reports
