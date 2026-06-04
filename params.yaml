@@ -3,3 +3,4 @@ data_ingestion:
 
 feature_engineering:
   max_features: 200
+  ngram_range: [1,2]

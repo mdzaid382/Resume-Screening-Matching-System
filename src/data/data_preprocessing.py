@@ -10,6 +10,7 @@ from src.logger import logging
 from sklearn.preprocessing import LabelEncoder
 nltk.download('wordnet')
 nltk.download('stopwords')
+import pickle
 
 
 
@@ -87,6 +88,8 @@ def labelencoder(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
 
     le = LabelEncoder()
     df[col_name] = le.fit_transform(df[col_name])
+    pickle.dump(le, open('models/le.pkl', 'wb'))
+
     return df
 
 
