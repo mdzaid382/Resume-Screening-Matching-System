@@ -4,3 +4,8 @@ data_ingestion:
 feature_engineering:
   max_features: 200
   ngram_range: [1,2]
+
+model_building:
+  C: 10
+  penalty: 'l2'
+
