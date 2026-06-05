@@ -5,7 +5,10 @@ import os
 from sklearn.model_selection import train_test_split
 import yaml
 from src.logger import logging
-# from src.connections import s3_connection
+from src.connections import s3_connection
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def load_params(params_path: str) -> dict:
@@ -56,9 +59,13 @@ def main():
         test_size = params['data_ingestion']['test_size']
         
         
-        df = load_data(data_path=r'D:\Resume-Screening-Matching-System\data_upload_S3\data\cleaned_dataset.csv')
-        # s3 = s3_connection.s3_operations("bucket-name", "accesskey", "secretkey")
-        # df = s3.fetch_file_from_s3("data.csv")
+        # df = load_data(data_path=r'D:\Resume-Screening-Matching-System\data_upload_S3\data\cleaned_dataset.csv')
+        s3 = s3_connection.s3_operations(bucket_name=os.getenv("S3_BUCKET_NAME"),
+                                         aws_access_key=os.getenv("AWS_ACCESS_KEY_ID"),
+                                         aws_secret_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+                                         region_name='us-east-1'
+                                         )
+        df = s3.fetch_file_from_s3("data/resume_data.csv")
 
 
 
