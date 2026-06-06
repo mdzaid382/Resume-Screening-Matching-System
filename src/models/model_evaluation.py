@@ -7,6 +7,7 @@ from src.logger import logging
 import os
 import mlflow
 from dotenv import load_dotenv
+from sklearn.pipeline import Pipeline
 
 load_dotenv()
 
@@ -101,7 +102,15 @@ def main():
     mlflow.set_experiment("my_dvc_pipeline")
     with mlflow.start_run() as run:  # Start an MLflow run
         try:
+            vectorizer = load_model('./models/vectorizer.pkl')
             clf = load_model('./models/model.pkl')
+           
+
+            pipeline = Pipeline([
+                ('vectorizer', vectorizer),
+                ('model', clf)
+            ])
+
             test_data = load_data('./data/processed/test_tfidf.csv')
             
             X_test = test_data.iloc[:, :-1].values
@@ -122,7 +131,7 @@ def main():
                     mlflow.log_param(param_name, param_value)
             
             # Log model to MLflow
-            mlflow.sklearn.log_model(clf, "model")
+            mlflow.sklearn.log_model(pipeline, "model")
             
             # Save model info
             save_model_info(run.info.run_id, "model", 'reports/experiment_info.json')
