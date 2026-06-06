@@ -226,3 +226,4 @@ models/*
 logs/
 demo.ipynb
 reports
+mlruns
