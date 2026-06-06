@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Resume Screening & Matching System</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+            Resume Screening & Matching System
+        </h1>
+
+        <p>
+            Paste a Job Description and upload multiple resumes to rank candidates automatically.
+        </p>
+
+    </div>
+
+    <div class="upload-card">
+
+        <form
+            action="/"
+            method="post"
+            enctype="multipart/form-data">
+
+            <!-- Job Description Text Area -->
+            <div class="form-group">
+
+                <label>
+                    📄 Job Description
+                </label>
+
+                <textarea
+                    name="job_description"
+                    rows="10"
+                    placeholder="Paste the job description here..."
+                    required></textarea>
+
+            </div>
+
+            <!-- Minimum Score -->
+            <div class="form-group">
+
+                <label>
+                    🎯 Minimum Score for Shortlisting
+                </label>
+
+                <input
+                    type="number"
+                    class="score-input"
+                    name="min_score"
+                    min="0"
+                    max="100"
+                    value="{{ min_score if min_score is defined else 60 }}"
+                    required>
+
+            </div>
+
+            <!-- Resume Upload -->
+            <div class="form-group">
+
+                <label>
+                    📁 Upload Multiple Resumes (PDF)
+                </label>
+
+                <div class="file-box">
+
+                    <input
+                        type="file"
+                        name="resumes"
+                        multiple
+                        accept=".pdf"
+                        required>
+
+                </div>
+
+            </div>
+
+            <button
+                class="btn"
+                type="submit">
+
+                Analyze Candidates
+
+            </button>
+
+        </form>
+
+    </div>
+
+    {% if results %}
+
+    <div class="results-card">
+
+        <div class="results-header">
+
+            <h2 class="results-title">
+                Candidate Ranking Results
+            </h2>
+
+            <div class="threshold-box">
+                Shortlisting Threshold:
+                <strong>{{ min_score }}%</strong>
+            </div>
+
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Rank</th>
+                    <th>Resume</th>
+                    <th>Predicted Role</th>
+                    <th>Match Score</th>
+                    <th>Status</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for row in results %}
+
+                <tr>
+
+                    <td class="rank">
+                        #{{ row.rank }}
+                    </td>
+
+                    <td>
+                        {{ row.resume }}
+                    </td>
+
+                    <td>
+                        {{ row.role }}
+                    </td>
+
+                    <td>
+
+                        {% if row.score >= 80 %}
+
+                            <span class="score-high">
+                                {{ row.score }}%
+                            </span>
+
+                        {% elif row.score >= 60 %}
+
+                            <span class="score-medium">
+                                {{ row.score }}%
+                            </span>
+
+                        {% else %}
+
+                            <span class="score-low">
+                                {{ row.score }}%
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if row.status == 'Shortlisted' %}
+
+                            <span class="shortlisted">
+                                Shortlisted
+                            </span>
+
+                        {% else %}
+
+                            <span class="rejected">
+                                Rejected
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>
