@@ -1,15 +1,15 @@
-from pypdf import PdfReader
+from io import BytesIO
+from PyPDF2 import PdfReader
 
+def extract_text_from_pdf(pdf_bytes):
+    pdf_file = BytesIO(pdf_bytes)
 
+    reader = PdfReader(pdf_file)
 
-def extract_text_from_pdf(pdf_path: str) -> str:
-    #Load the PDF file
-    text = ''
-    reader = PdfReader(pdf_path)
+    text = ""
 
-    #Extract and append text from all pages
     for page in reader.pages:
-        text += page.extract_text()
+        text += page.extract_text() or ""
 
     return text
 

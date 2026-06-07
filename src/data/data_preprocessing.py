@@ -7,7 +7,6 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from src.logger import logging
-from sklearn.preprocessing import LabelEncoder
 nltk.download('wordnet')
 nltk.download('stopwords')
 import pickle
@@ -84,15 +83,6 @@ def preprocess_dataframe(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
     return df
 
 
-def labelencoder(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
-
-    le = LabelEncoder()
-    df[col_name] = le.fit_transform(df[col_name])
-    pickle.dump(le, open('models/le.pkl', 'wb'))
-
-    return df
-
-
 def main():
     try:
         # Fetch the data from data/raw
@@ -105,17 +95,12 @@ def main():
         test_processed_data = preprocess_dataframe(test_data, 'Resume')
         logging.info('data processed completed.')
 
-        #labels the target column
-        train_labeled_data = labelencoder(train_processed_data, 'Role')
-        test_labeled_data = labelencoder(test_processed_data, 'Role')
-        logging.info('target column labeled.')
-
         # Store the data inside data/processed
         data_path = os.path.join("./data", "interim")
         os.makedirs(data_path, exist_ok=True)
         
-        train_labeled_data.to_csv(os.path.join(data_path, "train_processed.csv"), index=False)
-        test_labeled_data.to_csv(os.path.join(data_path, "test_processed.csv"), index=False)
+        train_processed_data.to_csv(os.path.join(data_path, "train_processed.csv"), index=False)
+        test_processed_data.to_csv(os.path.join(data_path, "test_processed.csv"), index=False)
         
         logging.info('Processed data saved to %s', data_path)
     except Exception as e:

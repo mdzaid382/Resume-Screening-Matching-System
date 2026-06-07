@@ -20,11 +20,8 @@ app.mount(
 
 templates = Jinja2Templates(directory="webapp/templates")
 
-UPLOAD_DIR = "src/webapp/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-
-@app.get("/", response_class=HTMLResponse)
+@app.get("/predict", response_class=HTMLResponse)
 async def home(request: Request):
 
     return templates.TemplateResponse(
@@ -50,15 +47,8 @@ async def screen_resumes(
 
     for resume in resumes:
 
-        resume_path = os.path.join(
-            UPLOAD_DIR,
-            resume.filename
-        )
-
-        with open(resume_path, "wb") as f:
-            f.write(await resume.read())
-
-        resume_text = extract_text_from_pdf(resume_path)
+        pdfbytes = await resume.read()
+        resume_text = extract_text_from_pdf(pdfbytes)
 
         role = predict_role(resume_text)
 
