@@ -1,20 +1,20 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from src.inference.preprocess_text import clean_text
 
 
-def calculate_similarity(jd_text, resume_text):
 
-    tfidf = TfidfVectorizer(
-        stop_words="english"
-    )
+def calculate_similarity(model,jd_text, resume_text):
+    
 
-    vectors = tfidf.fit_transform(
-        [jd_text, resume_text]
-    )
+
+    resume_text = clean_text(resume_text)
+    
+    resume_embedding = model.encode(resume_text)
+    jd_embedding = model.encode(jd_text.lower())
 
     score = cosine_similarity(
-        vectors[0:1],
-        vectors[1:2]
+    [resume_embedding],
+    [jd_embedding]
     )[0][0]
 
     return round(score * 100, 2)

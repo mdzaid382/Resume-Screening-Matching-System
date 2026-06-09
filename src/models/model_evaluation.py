@@ -8,6 +8,7 @@ import os
 import mlflow
 from dotenv import load_dotenv
 from sklearn.pipeline import Pipeline
+from src.models.model_building import save_model
 
 load_dotenv()
 
@@ -117,8 +118,9 @@ def main():
             y_test = test_data.iloc[:, -1].values
 
             metrics = evaluate_model(clf, X_test, y_test)
-            
             save_metrics(metrics, 'reports/metrics.json')
+            
+            save_model(pipeline, 'models/pipeline.pkl')
             
             # Log metrics to MLflow
             for metric_name, metric_value in metrics.items():

@@ -36,7 +36,6 @@
             method="post"
             enctype="multipart/form-data">
 
-            <!-- Job Description Text Area -->
             <div class="form-group">
 
                 <label>
@@ -51,7 +50,6 @@
 
             </div>
 
-            <!-- Minimum Score -->
             <div class="form-group">
 
                 <label>
@@ -69,7 +67,6 @@
 
             </div>
 
-            <!-- Resume Upload -->
             <div class="form-group">
 
                 <label>
@@ -125,6 +122,7 @@
                 <tr>
                     <th>Rank</th>
                     <th>Resume</th>
+                    <th>Email</th>
                     <th>Predicted Role</th>
                     <th>Match Score</th>
                     <th>Status</th>
@@ -144,6 +142,10 @@
 
                     <td>
                         {{ row.resume }}
+                    </td>
+
+                    <td>
+                        {{ row.email or "Not Found" }}
                     </td>
 
                     <td>
@@ -199,6 +201,18 @@
             </tbody>
 
         </table>
+
+        <div class="download-section">
+
+            <a
+                href="/download-csv"
+                class="download-btn">
+
+                📥 Download CSV
+
+            </a>
+
+        </div>
 
     </div>
 

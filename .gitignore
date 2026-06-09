@@ -223,6 +223,8 @@ data_upload_S3/ai-recruitment-pipeline-dataset.zip
 .vscode/
 /data
 models/*
+models/*
+!models/.gitkeep
 logs/
 demo.ipynb
 reports
