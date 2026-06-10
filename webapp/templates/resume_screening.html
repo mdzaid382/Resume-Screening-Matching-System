@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -6,217 +7,303 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Resume Screening & Matching System</title>
+```
+<title>Resume Screening & Matching System</title>
 
-    <link
-        rel="stylesheet"
-        href="/static/css/style.css">
+<link
+    rel="stylesheet"
+    href="/static/css/style.css">
+```
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <div class="header">
+```
+<div class="header">
 
-        <h1>
-            Resume Screening & Matching System
-        </h1>
+    <h1>
+        Resume Screening & Matching System
+    </h1>
+
+    <p>
+        End-to-End Machine Learning Project for Automated Resume Classification, Candidate Ranking, and Job Matching.
+    </p>
+
+    <div class="author-info">
 
         <p>
-            Paste a Job Description and upload multiple resumes to rank candidates automatically.
+            Developed by <strong>Ansari Zaid</strong>
         </p>
 
-    </div>
+        <div class="project-links">
 
-    <div class="upload-card">
+            <a href="https://github.com/mdzaid382/Resume-Screening-Matching-System"
+               target="_blank">
+                GitHub Repository
+            </a>
 
-        <form
-            action="/predict"
-            method="post"
-            enctype="multipart/form-data">
+            <span>|</span>
 
-            <div class="form-group">
-
-                <label>
-                    📄 Job Description
-                </label>
-
-                <textarea
-                    name="job_description"
-                    rows="10"
-                    placeholder="Paste the job description here..."
-                    required></textarea>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-                    🎯 Minimum Score for Shortlisting
-                </label>
-
-                <input
-                    type="number"
-                    class="score-input"
-                    name="min_score"
-                    min="0"
-                    max="100"
-                    value="{{ min_score if min_score is defined else 60 }}"
-                    required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>
-                    📁 Upload Multiple Resumes (PDF)
-                </label>
-
-                <div class="file-box">
-
-                    <input
-                        type="file"
-                        name="resumes"
-                        multiple
-                        accept=".pdf"
-                        required>
-
-                </div>
-
-            </div>
-
-            <button
-                class="btn"
-                type="submit">
-
-                Analyze Candidates
-
-            </button>
-
-        </form>
-
-    </div>
-
-    {% if results %}
-
-    <div class="results-card">
-
-        <div class="results-header">
-
-            <h2 class="results-title">
-                Candidate Ranking Results
-            </h2>
-
-            <div class="threshold-box">
-                Shortlisting Threshold:
-                <strong>{{ min_score }}%</strong>
-            </div>
-
-        </div>
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Rank</th>
-                    <th>Resume</th>
-                    <th>Email</th>
-                    <th>Predicted Role</th>
-                    <th>Match Score</th>
-                    <th>Status</th>
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-            {% for row in results %}
-
-                <tr>
-
-                    <td class="rank">
-                        #{{ row.rank }}
-                    </td>
-
-                    <td>
-                        {{ row.resume }}
-                    </td>
-
-                    <td>
-                        {{ row.email or "Not Found" }}
-                    </td>
-
-                    <td>
-                        {{ row.role }}
-                    </td>
-
-                    <td>
-
-                        {% if row.score >= 80 %}
-
-                            <span class="score-high">
-                                {{ row.score }}%
-                            </span>
-
-                        {% elif row.score >= 60 %}
-
-                            <span class="score-medium">
-                                {{ row.score }}%
-                            </span>
-
-                        {% else %}
-
-                            <span class="score-low">
-                                {{ row.score }}%
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-                    <td>
-
-                        {% if row.status == 'Shortlisted' %}
-
-                            <span class="shortlisted">
-                                Shortlisted
-                            </span>
-
-                        {% else %}
-
-                            <span class="rejected">
-                                Rejected
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-                </tr>
-
-            {% endfor %}
-
-            </tbody>
-
-        </table>
-
-        <div class="download-section">
-
-            <a
-                href="/download-csv"
-                class="download-btn">
-
-                📥 Download CSV
-
+            <a href="https://www.linkedin.com/in/mdzaid382/"
+               target="_blank">
+                LinkedIn
             </a>
 
         </div>
 
     </div>
 
-    {% endif %}
+</div>
+
+<div class="project-overview">
+
+    <h3>
+        🚀 Project Highlights
+    </h3>
+
+    <div class="tech-stack">
+
+        <span>FastAPI</span>
+        <span>Machine Learning</span>
+        <span>Linear SVC</span>
+        <span>sentence_transformer</span>
+        <span>Docker</span>
+        <span>AWS S3</span>
+        <span>AWS ECR</span>
+        <span>DVC</span>
+        <span>MLflow</span>
+
+    </div>
+
+    <ul>
+
+        <li>
+            Automated Resume Role Classification using Machine Learning.
+        </li>
+
+        <li>
+            Resume-to-Job Description Matching using sentence_transformer and Cosine Similarity.
+        </li>
+
+        <li>
+            Bulk Resume Processing and Candidate Ranking.
+        </li>
+
+        <li>
+            End-to-End MLOps Pipeline with DVC, MLflow, AWS S3, AWS ECR and Docker.
+        </li>
+
+        <li>
+            Experiment Tracking and Model Versioning.
+        </li>
+
+    </ul>
+
+</div>
+
+<div class="upload-card">
+
+    <form
+        action="/predict"
+        method="post"
+        enctype="multipart/form-data">
+
+        <div class="form-group">
+
+            <label>
+                📄 Job Description
+            </label>
+
+            <textarea
+                name="job_description"
+                rows="10"
+                placeholder="Paste the job description here..."
+                required></textarea>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                🎯 Minimum Score for Shortlisting
+            </label>
+
+            <input
+                type="number"
+                class="score-input"
+                name="min_score"
+                min="0"
+                max="100"
+                value="{{ min_score if min_score is defined else 60 }}"
+                required>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                📁 Upload Multiple Resumes (PDF)
+            </label>
+
+            <div class="file-box">
+
+                <input
+                    type="file"
+                    name="resumes"
+                    multiple
+                    accept=".pdf"
+                    required>
+
+            </div>
+
+        </div>
+
+        <button
+            class="btn"
+            type="submit">
+
+            Analyze Candidates
+
+        </button>
+
+    </form>
+
+</div>
+
+{% if results %}
+
+<div class="results-card">
+
+    <div class="results-header">
+
+        <h2 class="results-title">
+            Candidate Ranking Results
+        </h2>
+
+        <div class="threshold-box">
+            Shortlisting Threshold:
+            <strong>{{ min_score }}%</strong>
+        </div>
+
+    </div>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Rank</th>
+                <th>Resume</th>
+                <th>Email</th>
+                <th>Predicted Role</th>
+                <th>Match Score</th>
+                <th>Status</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+        {% for row in results %}
+
+            <tr>
+
+                <td class="rank">
+                    #{{ row.rank }}
+                </td>
+
+                <td>
+                    {{ row.resume }}
+                </td>
+
+                <td>
+                    {{ row.email or "Not Found" }}
+                </td>
+
+                <td>
+                    {{ row.role }}
+                </td>
+
+                <td>
+
+                    {% if row.score >= 80 %}
+
+                        <span class="score-high">
+                            {{ row.score }}%
+                        </span>
+
+                    {% elif row.score >= 60 %}
+
+                        <span class="score-medium">
+                            {{ row.score }}%
+                        </span>
+
+                    {% else %}
+
+                        <span class="score-low">
+                            {{ row.score }}%
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if row.status == 'Shortlisted' %}
+
+                        <span class="shortlisted">
+                            Shortlisted
+                        </span>
+
+                    {% else %}
+
+                        <span class="rejected">
+                            Rejected
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <div class="download-section">
+
+        <a
+            href="/download-csv"
+            class="download-btn">
+
+            📥 Download CSV
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endif %}
+
+<footer class="footer">
+
+    <p>
+        Resume Screening & Matching System • Built with FastAPI, Scikit-Learn, Docker, DVC, MLflow, AWS ECR and AWS S3
+    </p>
+
+    <p>
+        © 2026 Ansari Zaid
+
+</footer>
+```
 
 </div>
 

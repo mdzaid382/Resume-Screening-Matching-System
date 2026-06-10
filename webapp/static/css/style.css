@@ -312,3 +312,183 @@ tbody tr:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 35px rgba(0,245,255,0.5);
 }
+/* ==========================================
+   AUTHOR SECTION
+========================================== */
+
+.author-info {
+    margin-top: 20px;
+}
+
+.author-info p {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    color: rgba(255,255,255,0.95);
+}
+
+.project-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.project-links a {
+    text-decoration: none;
+    color: #00f5ff;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.project-links a:hover {
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(0,245,255,0.8);
+}
+
+.project-links span {
+    color: rgba(255,255,255,0.5);
+}
+
+/* ==========================================
+   PROJECT OVERVIEW CARD
+========================================== */
+
+.project-overview {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
+
+.project-overview h3 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+/* ==========================================
+   TECH STACK TAGS
+========================================== */
+
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.tech-stack span {
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: rgba(0,245,255,0.15);
+    border: 1px solid rgba(0,245,255,0.4);
+    color: #00f5ff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: 0.3s ease;
+}
+
+.tech-stack span:hover {
+    transform: translateY(-2px);
+    background: rgba(0,245,255,0.25);
+}
+
+/* ==========================================
+   HIGHLIGHTS LIST
+========================================== */
+
+.project-overview ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.project-overview ul li {
+    padding: 12px 0;
+    color: rgba(255,255,255,0.95);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.project-overview ul li:last-child {
+    border-bottom: none;
+}
+
+.project-overview ul li::before {
+    content: "✓";
+    color: #00f5ff;
+    font-weight: 700;
+    margin-right: 12px;
+}
+
+/* ==========================================
+   FOOTER
+========================================== */
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 25px 15px;
+    color: rgba(255,255,255,0.8);
+}
+
+.footer p:first-child {
+    margin-bottom: 8px;
+}
+
+.footer p:last-child {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0,245,255,0.4);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,245,255,0.6);
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 768px) {
+
+    .project-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .project-links span {
+        display: none;
+    }
+
+    .tech-stack {
+        justify-content: center;
+    }
+
+    .project-overview {
+        padding: 20px;
+    }
+
+    .project-overview h3 {
+        text-align: center;
+    }
+}
