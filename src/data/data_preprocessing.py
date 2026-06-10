@@ -1,111 +1,155 @@
-# data preprocessing
-
-import pandas as pd
 import os
 import re
 import nltk
+import pandas as pd
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from src.logger import logging
-nltk.download('wordnet')
-nltk.download('stopwords')
-import pickle
+from src.utils.utils import save_data, load_data
+
+try:
+    nltk.data.find("corpora/wordnet")
+except LookupError:
+    nltk.download("wordnet")
+
+try:
+    nltk.data.find("corpora/stopwords")
+except LookupError:
+    nltk.download("stopwords")
 
 
+class DataPreprocessing:
+    """Preprocess resume text data."""
 
+    def __init__(
+        self,
+        raw_data_dir: str = "./data/raw",
+        output_dir: str = "./data/interim",
+        text_column: str = "Resume",
+    ):
+        self.raw_data_dir = raw_data_dir
+        self.output_dir = output_dir
+        self.text_column = text_column
 
+        self.lemmatizer = WordNetLemmatizer()
+        self.stop_words = set(stopwords.words("english"))
 
-def clean_text(text: str) -> str:
+    def clean_text(
+            self,
+            text: str
+        ) -> str:
+        """Clean and preprocess resume text."""
 
-    # Initialize lemmatizer and stopwords
-    lemmatizer = WordNetLemmatizer()
-    stop_words = set(stopwords.words("english"))
+        if pd.isna(text):
+            return ""
 
-    # Remove email addresses
-    text = re.sub(r'\S+@\S+', ' ', text)
+        # Remove email addresses
+        text = re.sub(r"\S+@\S+", " ", text)
 
-    # Remove URLs (linkedin, github, websites)
-    text = re.sub(r'http\S+|www\.\S+|linkedin\.com/\S+|github\.com/\S+', ' ', text)
+        # Remove URLs
+        text = re.sub(
+            r"http\S+|www\.\S+|linkedin\.com/\S+|github\.com/\S+",
+            " ",
+            text,
+        )
 
-    # Remove phone numbers
-    text = re.sub(
-        r'(\+\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})',
-        ' ',
-        text
-    )
+        # Remove phone numbers
+        text = re.sub(
+            r"(\+\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})",
+            " ",
+            text,
+        )
 
-    # Remove markdown links
-    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+        # Remove markdown links
+        text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
 
-    # Remove bullet symbols
-    text = re.sub(r'[•▪◦●■♦★]', ' ', text)
+        # Remove bullets
+        text = re.sub(r"[•▪◦●■♦★]", " ", text)
+        text = re.sub(r"\*", " ", text)
 
-    # Remove asterisks used as bullets
-    text = re.sub(r'\*', ' ', text)
+        # Keep useful characters
+        text = re.sub(r"[^a-zA-Z0-9+#/. ]", " ", text)
 
-    # Keep only letters, numbers, +, #, /, . and spaces
-    text = re.sub(r'[^a-zA-Z0-9+#/. ]', ' ', text)
+        # Lowercase
+        text = text.lower()
 
-    # Convert to lowercase
-    text = text.lower()
+        # Remove extra spaces
+        text = re.sub(r"\s+", " ", text).strip()
 
-    # Remove extra spaces
-    text = re.sub(r'\s+', ' ', text).strip()
+        # Remove stopwords
+        text = " ".join(
+            word
+            for word in text.split()
+            if word not in self.stop_words
+        )
+
+        # Lemmatization
+        text = " ".join(
+            self.lemmatizer.lemmatize(word)
+            for word in text.split()
+        )
+
+        return text
+
+    def preprocess_dataframe(
+        self,
+        df: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """Apply preprocessing to dataframe."""
+
+        df = df.copy()
+
+        df[self.text_column] = (
+            df[self.text_column]
+            .fillna("")
+            .apply(self.clean_text)
+        )
+
+        df = df.dropna(subset=[self.text_column])
+
+        logging.info("Data preprocessing completed")
+
+        return df
+
     
-    #remove stopwords
-    text = " ".join([word for word in text.split() if word not in stop_words])
+    def run(self) -> None:
+        """Execute preprocessing pipeline."""
 
-    #lematize the text
-    text = " ".join([lemmatizer.lemmatize(word) for word in text.split()])
-   
+        try:
+            train_df, test_df = load_data(
+                self.raw_data_dir,
+                "train.csv",
+                "test.csv"
+            )
 
-    return text
+            train_processed = self.preprocess_dataframe(
+                train_df
+            )
+
+            test_processed = self.preprocess_dataframe(
+                test_df
+            )
+
+            save_data(
+                train_processed,
+                test_processed,
+                self.output_dir,
+                "train_processed.csv",
+                "test_processed.csv"
+            )
+
+            logging.info(
+                "Data preprocessing pipeline completed successfully."
+            )
+
+        except Exception as e:
+            logging.error(
+                "Data preprocessing pipeline failed: %s",
+                e,
+            )
+            raise
 
 
-def preprocess_dataframe(df: pd.DataFrame, col_name: str) -> pd.DataFrame:
-    """
-    Preprocess a DataFrame by applying text preprocessing to a specific column.
-
-    Args:
-        df (pd.DataFrame): The DataFrame to preprocess.
-        col (str): The name of the column containing text.
-
-    Returns:
-        pd.DataFrame: The preprocessed DataFrame.
-    """
-
-    # Apply preprocessing to the specified column
-    df[col_name] = df[col_name].apply(clean_text)
-
-    # Drop rows with NaN values
-    df = df.dropna(subset=[col_name])
-    logging.info("Data pre-processing completed")
-    return df
-
-
-def main():
-    try:
-        # Fetch the data from data/raw
-        train_data = pd.read_csv('./data/raw/train.csv')
-        test_data = pd.read_csv('./data/raw/test.csv')
-        logging.info('data loaded properly')
-
-        # Transform the data
-        train_processed_data = preprocess_dataframe(train_data, 'Resume')
-        test_processed_data = preprocess_dataframe(test_data, 'Resume')
-        logging.info('data processed completed.')
-
-        # Store the data inside data/processed
-        data_path = os.path.join("./data", "interim")
-        os.makedirs(data_path, exist_ok=True)
-        
-        train_processed_data.to_csv(os.path.join(data_path, "train_processed.csv"), index=False)
-        test_processed_data.to_csv(os.path.join(data_path, "test_processed.csv"), index=False)
-        
-        logging.info('Processed data saved to %s', data_path)
-    except Exception as e:
-        logging.error('Failed to complete the data transformation process: %s', e)
-        print(f"Error: {e}")
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    preprocessing = DataPreprocessing()
+    preprocessing.run()

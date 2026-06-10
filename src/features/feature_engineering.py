@@ -1,102 +1,181 @@
-# feature engineering
-import numpy as np
-import pandas as pd
 import os
-from sklearn.feature_extraction.text import TfidfVectorizer
-from src.logger import logging
 import pickle
 import yaml
+import pandas as pd
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from src.logger import logging
+from src.utils.utils import load_data, save_data, load_params
 
 
-def load_params(params_path: str) -> dict:
-    """Load parameters from a YAML file."""
-    try:
-        with open(params_path, 'r') as file:
-            params = yaml.safe_load(file)
-        logging.debug('Parameters retrieved from %s', params_path)
-        return params
-    except FileNotFoundError:
-        logging.error('File not found: %s', params_path)
-        raise
-    except yaml.YAMLError as e:
-        logging.error('YAML error: %s', e)
-        raise
-    except Exception as e:
-        logging.error('Unexpected error: %s', e)
-        raise
+class FeatureEngineering:
+    """Feature engineering pipeline using TF-IDF."""
 
-def load_data(file_path: str) -> pd.DataFrame:
-    """Load data from a CSV file."""
-    try:
-        df = pd.read_csv(file_path)
-        df.fillna('', inplace=True)
-        logging.info('Data loaded and NaNs filled from %s', file_path)
-        return df
-    except pd.errors.ParserError as e:
-        logging.error('Failed to parse the CSV file: %s', e)
-        raise
-    except Exception as e:
-        logging.error('Unexpected error occurred while loading the data: %s', e)
-        raise
+    def __init__(
+        self,
+        params_path: str = "params.yaml",
+        input_dir: str = "./data/interim",
+        output_dir: str = "./data/processed",
+        model_dir: str = "./models",
+    ):
+        self.params_path = params_path
+        self.input_dir = input_dir
+        self.output_dir = output_dir
+        self.model_dir = model_dir
 
-def apply_tfidf(train_data: pd.DataFrame, test_data: pd.DataFrame, max_features: int, ngram_range: tuple[int, int]) -> tuple:
-    """Apply tfidf Vectorizer to the data."""
-    try:
-        logging.info("Applying tfidf...")
-        vectorizer = TfidfVectorizer(
-            max_features=max_features,
-            ngram_range=ngram_range
+
+    def apply_tfidf(
+        self,
+        train_df: pd.DataFrame,
+        test_df: pd.DataFrame,
+        max_features: int,
+        ngram_range: tuple[int, int],
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """Apply TF-IDF vectorization."""
+
+        try:
+            logging.info("Applying TF-IDF vectorization")
+
+            vectorizer = TfidfVectorizer(
+                max_features=max_features,
+                ngram_range=ngram_range,
             )
 
-        X_train = train_data['Resume'].values
-        y_train = train_data['Role'].values
-        X_test = test_data['Resume'].values
-        y_test = test_data['Role'].values
+            X_train = train_df["Resume"]
+            y_train = train_df["Role"]
 
-        X_train_tfidf = vectorizer.fit_transform(X_train)
-        X_test_tfidf = vectorizer.transform(X_test)
+            X_test = test_df["Resume"]
+            y_test = test_df["Role"]
 
-        train_df = pd.DataFrame(X_train_tfidf.toarray())
-        train_df['label'] = y_train
+            X_train_tfidf = vectorizer.fit_transform(
+                X_train
+            )
 
-        test_df = pd.DataFrame(X_test_tfidf.toarray())
-        test_df['label'] = y_test
+            X_test_tfidf = vectorizer.transform(
+                X_test
+            )
 
-        pickle.dump(vectorizer, open('models/vectorizer.pkl', 'wb'))
-        logging.info('tfidf of Words applied and data transformed')
+            train_features = pd.DataFrame(
+                X_train_tfidf.toarray()
+            )
 
-        return train_df, test_df
-    except Exception as e:
-        logging.error('Error during tfidf transformation: %s', e)
-        raise
+            train_features["label"] = y_train.values
 
-def save_data(df: pd.DataFrame, file_path: str) -> None:
-    """Save the dataframe to a CSV file."""
-    try:
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        df.to_csv(file_path, index=False)
-        logging.info('Data saved to %s', file_path)
-    except Exception as e:
-        logging.error('Unexpected error occurred while saving the data: %s', e)
-        raise
+            test_features = pd.DataFrame(
+                X_test_tfidf.toarray()
+            )
 
-def main():
-    try:
-        params = load_params('params.yaml')
-        max_features = params['feature_engineering']['max_features']
-        ngram_range = tuple(params['feature_engineering']['ngram_range'])
-       
+            test_features["label"] = y_test.values
 
-        train_data = load_data('./data/interim/train_processed.csv')
-        test_data = load_data('./data/interim/test_processed.csv')
+            self.save_vectorizer(vectorizer)
 
-        train_df, test_df = apply_tfidf(train_data, test_data, max_features, ngram_range)
+            logging.info(
+                "TF-IDF transformation completed"
+            )
 
-        save_data(train_df, os.path.join("./data", "processed", "train_tfidf.csv"))
-        save_data(test_df, os.path.join("./data", "processed", "test_tfidf.csv"))
-    except Exception as e:
-        logging.error('Failed to complete the feature engineering process: %s', e)
-        print(f"Error: {e}")
+            return train_features, test_features
 
-if __name__ == '__main__':
-    main()
+        except Exception as e:
+            logging.error(
+                "TF-IDF transformation failed: %s",
+                e,
+            )
+            raise
+
+    def save_vectorizer(
+        self,
+        vectorizer: TfidfVectorizer,
+    ) -> None:
+        """Save trained vectorizer."""
+
+        try:
+            os.makedirs(
+                self.model_dir,
+                exist_ok=True,
+            )
+
+            vectorizer_path = os.path.join(
+                self.model_dir,
+                "vectorizer.pkl",
+            )
+
+            with open(
+                vectorizer_path,
+                "wb",
+            ) as file:
+                pickle.dump(
+                    vectorizer,
+                    file,
+                )
+
+            logging.info(
+                "Vectorizer saved to %s",
+                vectorizer_path,
+            )
+
+        except Exception as e:
+            logging.error(
+                "Failed to save vectorizer: %s",
+                e,
+            )
+            raise
+
+    
+    def run(self) -> None:
+        """Execute feature engineering pipeline."""
+
+        try:
+            params = load_params("params.yaml")
+
+            max_features = params[
+                "feature_engineering"
+            ]["max_features"]
+
+            ngram_range = tuple(
+                params["feature_engineering"][
+                    "ngram_range"
+                ]
+            )
+
+            train_df, test_df = load_data(
+                self.input_dir,
+                "train_processed.csv",
+                "test_processed.csv"
+            )
+
+
+            train_features, test_features = (
+                self.apply_tfidf(
+                    train_df,
+                    test_df,
+                    max_features,
+                    ngram_range,
+                )
+            )
+
+            save_data(
+                train_features,
+                test_features,
+                self.output_dir,
+                "train_tfidf.csv",
+                "test_tfidf.csv"
+            )
+
+
+
+            logging.info(
+                "Feature engineering pipeline completed successfully"
+            )
+
+        except Exception as e:
+            logging.error(
+                "Feature engineering pipeline failed: %s",
+                e,
+            )
+            raise
+
+
+if __name__ == "__main__":
+    feature_engineering = FeatureEngineering()
+    feature_engineering.run()
