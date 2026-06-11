@@ -11,6 +11,7 @@ from sklearn.metrics import (
 from src.inference.predictor import predict_role
 from src.inference.similarity import calculate_similarity
 from src.inference.pdf_extractor import extract_text_from_pdf
+from src.logger import logging
 
 
 class TestResumeScreeningSystem(unittest.TestCase):
@@ -174,6 +175,14 @@ class TestResumeScreeningSystem(unittest.TestCase):
         )
     
     def test_model_performance(self):
+
+        if not self.has_champion:
+            self.skipTest(
+                "No champion model exists yet"
+            )    
+        self.holdout_data = pd.read_csv('data/interim/test_processed.csv')
+        logging.info('test data loaded.')
+
         # Extract features and labels from holdout test data
         X_holdout = self.holdout_data.iloc[:,0:-1]
         y_holdout = self.holdout_data.iloc[:,-1]
@@ -202,13 +211,11 @@ class TestResumeScreeningSystem(unittest.TestCase):
             average='weighted'
         )
 
-    
-
         # Assert that the new model meets the performance thresholds
-        self.assertGreaterEqual(accuracy_new, self., f'Accuracy should be at least {expected_accuracy}')
-        self.assertGreaterEqual(precision_new, expected_precision, f'Precision should be at least {expected_precision}')
-        self.assertGreaterEqual(recall_new, expected_recall, f'Recall should be at least {expected_recall}')
-        self.assertGreaterEqual(f1_new, expected_f1, f'F1 score should be at least {expected_f1}')
+        self.assertGreaterEqual(accuracy_new, self.champ_accuracy, f'Accuracy should be at least {self.champ_accuracy}')
+        self.assertGreaterEqual(precision_new, self.champ_precision, f'Precision should be at least {self.champ_precision}')
+        self.assertGreaterEqual(recall_new, self.champ_recall, f'Recall should be at least {self.champ_recall}')
+        self.assertGreaterEqual(f1_new, self.champ_f1, f'F1 score should be at least {self.champ_f1}')
 
     
 if __name__ == "__main__":
