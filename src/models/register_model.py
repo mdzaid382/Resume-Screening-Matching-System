@@ -11,7 +11,7 @@ class ModelRegistrar:
     def __init__(
         self,
         model_info_path: str = "reports/experiment_info.json",
-        model_name: str = "my_model"
+        model_name: str = "resume-screening"
     ):
         self.model_info_path = model_info_path
         self.model_name = model_name
@@ -24,7 +24,6 @@ class ModelRegistrar:
         load_dotenv()
 
         dagshub_token = os.getenv("DAGSHUB_TOKEN")
-        
 
         if not dagshub_token:
             raise EnvironmentError(
@@ -96,16 +95,44 @@ class ModelRegistrar:
                 name=self.model_name
             )
 
-            client.transition_model_version_stage(
-                name=self.model_name,
-                version=model_version.version,
-                stage="Staging"
-            )
+            version = model_version.version
 
             logging.info(
                 "Model version %s registered successfully",
-                model_version.version
+                version
             )
+
+            try:
+                client.get_model_version_by_alias(
+                    name=self.model_name,
+                    alias="champion"
+                )
+
+                client.set_registered_model_alias(
+                    name=self.model_name,
+                    alias="challenger",
+                    version=version
+                )
+
+                logging.info(
+                    "Assigned alias 'challenger' to version %s",
+                    version
+                )
+
+            except Exception:
+
+                client.set_registered_model_alias(
+                    name=self.model_name,
+                    alias="champion",
+                    version=version
+                )
+
+                logging.info(
+                    "First model detected. "
+                    "Assigned aliases 'champion' and "
+                    "'challenger' to version %s",
+                    version
+                )
 
         except Exception as e:
             logging.error(
