@@ -24,7 +24,7 @@ class DataIngestion:
         self.output_dir = output_dir
 
         self.s3 = s3_connection.s3_operations(
-            bucket_name=os.getenv("S3_BUCKET_NAME"),
+            bucket_name="resume-screening-and-matching",
             aws_access_key=os.getenv("AWS_ACCESS_KEY_ID"),
             aws_secret_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
             region_name="us-east-1",
