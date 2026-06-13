@@ -17,4 +17,5 @@ def calculate_similarity(model,jd_text, resume_text):
     [jd_embedding]
     )[0][0]
 
-    return round(score * 100, 2)
+
+    return round(float(score) * 100, 2)

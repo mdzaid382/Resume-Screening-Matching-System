@@ -152,13 +152,14 @@ class TestResumeScreeningSystem(unittest.TestCase):
     
     def test_pdf_extraction(self):
     
-        pdf_path = "tests/sample resume.pdf"
+        pdf_path = "tests/sample_resume.pdf"
     
         if os.path.exists(pdf_path):
+        
+            with open(pdf_path, "rb") as f:
+                pdf_bytes = f.read()
     
-            text = extract_text_from_pdf(
-                pdf_path
-            )
+            text = extract_text_from_pdf(pdf_bytes)
     
             self.assertIsInstance(
                 text,
