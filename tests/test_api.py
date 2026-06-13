@@ -28,7 +28,7 @@ class TestAPI(unittest.TestCase):
 
     def test_predict_page(self):
 
-        response = self.client.post(
+        response = client.post(
             "/predict",
             data={
                 "job_description": "Python ML NLP",
