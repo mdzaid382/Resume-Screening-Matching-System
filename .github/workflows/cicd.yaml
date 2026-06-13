@@ -85,3 +85,33 @@ jobs:
         run: |
           docker push \
             $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+
+          script: |
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 009164982415.dkr.ecr.us-east-1.amazonaws.com
+
+            docker pull \
+            009164982415.dkr.ecr.us-east-1.amazonaws.com/resume-screening:latest
+
+            docker stop resume-screening || true
+
+            docker rm resume-screening || true
+
+            docker run -d \
+            --name resume-screening \
+            -p 80:8000 \
+            009164982415.dkr.ecr.us-east-1.amazonaws.com/resume-screening:latest

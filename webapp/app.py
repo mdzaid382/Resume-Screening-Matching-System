@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI):
     
     app.state.emb_model = SentenceTransformer("all-MiniLM-L6-v2")
     app.state.role_model = mlflow.pyfunc.load_model(
-    f"models:/resume-screening@challenger"
+    f"models:/resume_screening@challenger"
 )
 
     yield

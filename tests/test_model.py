@@ -40,7 +40,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
             f"{dagshub_url}/{repo_owner}/{repo_name}.mlflow"
         )
     
-        cls.model_name = "resume-screening"
+        cls.model_name = "resume_screening"
         client = mlflow.MlflowClient()
 
         cls.new_model = mlflow.pyfunc.load_model(
