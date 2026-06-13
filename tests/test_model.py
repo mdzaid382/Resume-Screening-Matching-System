@@ -39,12 +39,13 @@ class TestResumeScreeningSystem(unittest.TestCase):
         )
     
         cls.model_name = "resume-screening"
-    
+        client = mlflow.MlflowClient()
+        
         cls.new_model = mlflow.pyfunc.load_model(
             f"models:/{cls.model_name}@challenger"
         )
     
-        client = mlflow.MlflowClient()
+        
     
         try:
             champion_version = client.get_model_version_by_alias(
