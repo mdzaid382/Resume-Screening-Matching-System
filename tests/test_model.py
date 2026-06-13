@@ -40,7 +40,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
     
         cls.model_name = "resume-screening"
         client = mlflow.MlflowClient()
-        
+
         cls.new_model = mlflow.pyfunc.load_model(
             f"models:/{cls.model_name}@challenger"
         )
@@ -100,6 +100,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
     def test_similarity_score_range(self):
     
         score = calculate_similarity(
+            self.new_model,
             self.sample_jd,
             self.sample_resume
         )
@@ -117,6 +118,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
     def test_similarity_type(self):
     
         score = calculate_similarity(
+            self.new_model,
             self.sample_jd,
             self.sample_resume
         )
@@ -129,11 +131,13 @@ class TestResumeScreeningSystem(unittest.TestCase):
     def test_resume_matches_better_than_random_text(self):
     
         good_score = calculate_similarity(
+            self.new_model,
             self.sample_jd,
             self.sample_resume
         )
     
         bad_score = calculate_similarity(
+            self.new_model,
             self.sample_jd,
             "I am a chef with cooking experience."
         )
