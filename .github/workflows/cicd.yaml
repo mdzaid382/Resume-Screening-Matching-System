@@ -58,7 +58,7 @@ jobs:
       # Only runs if all previous steps succeeded
       - name: Promote Challenger Model
         run: |
-          python src/pipeline/promote_model.py
+          python src/models/promote_model.py
 
 
       - name: Login to Amazon ECR
