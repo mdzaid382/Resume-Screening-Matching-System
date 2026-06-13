@@ -151,21 +151,21 @@ class TestResumeScreeningSystem(unittest.TestCase):
         )
     
     def test_pdf_extraction(self):
-    
+
         pdf_path = "tests/sample_resume.pdf"
-    
+
         if os.path.exists(pdf_path):
-        
+
             with open(pdf_path, "rb") as f:
                 pdf_bytes = f.read()
-    
+
             text = extract_text_from_pdf(pdf_bytes)
-    
+
             self.assertIsInstance(
                 text,
                 str
             )
-    
+
             self.assertGreater(
                 len(text),
                 0
@@ -193,9 +193,8 @@ class TestResumeScreeningSystem(unittest.TestCase):
         logging.info('test data loaded.')
 
         # Extract features and labels from holdout test data
-        X_holdout = self.holdout_data.iloc[:,0:-1]
-        y_holdout = self.holdout_data.iloc[:,-1]
-
+        X_holdout = self.holdout_data["Resume"]
+        y_holdout = self.holdout_data["Role"]
         # Predict using the new model
         y_pred_new = self.new_model.predict(X_holdout)
 

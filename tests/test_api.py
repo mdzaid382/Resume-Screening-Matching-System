@@ -3,55 +3,66 @@ import unittest
 from fastapi.testclient import TestClient
 from webapp.app import app
 
-client = TestClient(app)
 
 class TestAPI(unittest.TestCase):
 
-
     def test_home_route(self):
 
-        response = client.get("/")
+        with TestClient(app) as client:
 
-        self.assertEqual(
-            response.status_code,
-            200
-        )
+            response = client.get("/")
+
+            self.assertEqual(
+                response.status_code,
+                200
+            )
 
     def test_docs_route(self):
 
-        response = client.get("/docs")
+        with TestClient(app) as client:
 
-        self.assertEqual(
-            response.status_code,
-            200
-        )
+            response = client.get("/docs")
+
+            self.assertEqual(
+                response.status_code,
+                200
+            )
 
     def test_predict_page(self):
 
-        response = client.post(
-            "/predict",
-            data={
-                "job_description": "Python ML NLP",
-                "min_score": "50"
-            },
-            files={
-                "resumes": (
-                "sample.pdf",
-                open("tests/sample_resume.pdf", "rb"),
-                "application/pdf"
+        with TestClient(app) as client:
+
+            with open(
+                "tests/sample_resume.pdf",
+                "rb"
+            ) as pdf_file:
+
+                response = client.post(
+                    "/predict",
+                    data={
+                        "job_description": "Python ML NLP",
+                        "min_score": "50"
+                    },
+                    files={
+                        "resumes": (
+                            "sample.pdf",
+                            pdf_file,
+                            "application/pdf"
+                        )
+                    }
                 )
-            }
-        )
 
-        self.assertEqual(
-            response.status_code,
-            200
-        )
+            self.assertEqual(
+                response.status_code,
+                200
+            )
 
-        self.assertTrue(
-            "Shortlisted" in response.text or "Rejected" in response.text
-        )
+            self.assertTrue(
+                "Shortlisted" in response.text
+                or
+                "Rejected" in response.text
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
-    
