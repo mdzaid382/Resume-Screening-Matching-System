@@ -118,4 +118,5 @@ jobs:
               docker run -d \
               --name resume-screening \
               -p 80:8000 \
+              -e DAGSHUB_TOKEN='${{ secrets.DAGSHUB_TOKEN }}'
               009164982415.dkr.ecr.us-east-1.amazonaws.com/resume-screening:latest

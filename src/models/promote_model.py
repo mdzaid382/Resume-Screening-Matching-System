@@ -8,7 +8,7 @@ class ModelPromoter:
 
     def __init__(
         self,
-        model_name: str = "resume_screening"
+        model_name: str = "resume_screening_and_matching"
     ):
         self.model_name = model_name
         self.setup_mlflow()

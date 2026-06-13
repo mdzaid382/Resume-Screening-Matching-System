@@ -11,7 +11,7 @@ class ModelRegistrar:
     def __init__(
         self,
         model_info_path: str = "reports/experiment_info.json",
-        model_name: str = "resume_screening"
+        model_name: str = "resume_screening_and_matching"
     ):
         self.model_info_path = model_info_path
         self.model_name = model_name
@@ -165,7 +165,7 @@ class ModelRegistrar:
 
 if __name__ == "__main__":
     registrar = ModelRegistrar(
-        model_name="resume_screening"
+        model_name="resume_screening_and_matching"
     )
 
     registrar.run()
