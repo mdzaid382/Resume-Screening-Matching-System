@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY requirements/inference.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements/inference.txt
 
 COPY src/inference ./src/inference
 COPY webapp ./webapp
