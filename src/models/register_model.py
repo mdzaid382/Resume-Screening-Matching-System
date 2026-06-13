@@ -165,7 +165,7 @@ class ModelRegistrar:
 
 if __name__ == "__main__":
     registrar = ModelRegistrar(
-        model_name="my_model"
+        model_name="resume-screening"
     )
 
     registrar.run()
