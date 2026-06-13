@@ -12,6 +12,8 @@ from src.inference.predictor import predict_role
 from src.inference.similarity import calculate_similarity
 from src.inference.pdf_extractor import extract_text_from_pdf
 from src.logger import logging
+from sentence_transformers import SentenceTransformer
+
 
 
 class TestResumeScreeningSystem(unittest.TestCase):
@@ -44,6 +46,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
         cls.new_model = mlflow.pyfunc.load_model(
             f"models:/{cls.model_name}@challenger"
         )
+        cls.emb_model = SentenceTransformer("all-MiniLM-L6-v2")
     
         
     
@@ -100,7 +103,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
     def test_similarity_score_range(self):
     
         score = calculate_similarity(
-            self.new_model,
+            self.emb_model,
             self.sample_jd,
             self.sample_resume
         )
@@ -118,7 +121,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
     def test_similarity_type(self):
     
         score = calculate_similarity(
-            self.new_model,
+            self.emb_model,
             self.sample_jd,
             self.sample_resume
         )
@@ -131,13 +134,13 @@ class TestResumeScreeningSystem(unittest.TestCase):
     def test_resume_matches_better_than_random_text(self):
     
         good_score = calculate_similarity(
-            self.new_model,
+            self.emb_model,
             self.sample_jd,
             self.sample_resume
         )
     
         bad_score = calculate_similarity(
-            self.new_model,
+            self.emb_model,
             self.sample_jd,
             "I am a chef with cooking experience."
         )
@@ -149,7 +152,7 @@ class TestResumeScreeningSystem(unittest.TestCase):
     
     def test_pdf_extraction(self):
     
-        pdf_path = "tests/sample_resume.pdf"
+        pdf_path = "tests/sample resume.pdf"
     
         if os.path.exists(pdf_path):
     
