@@ -36,7 +36,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-
       - name: Install DVC
         run: |
           pip install dvc[s3]
