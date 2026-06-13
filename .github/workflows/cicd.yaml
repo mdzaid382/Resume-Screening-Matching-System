@@ -1,0 +1,86 @@
+name: Resume Screening CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  ci:
+    runs-on: ubuntu-latest
+
+    env:
+      DAGSHUB_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install DVC
+        run: |
+          pip install dvc[s3]
+
+      # Pull DVC-tracked files if needed
+      - name: DVC Pull
+        run: |
+          dvc pull
+
+      # Run complete pipeline
+      - name: Run DVC Pipeline
+        run: |
+          dvc repro
+
+      # Run tests against challenger/champion
+      - name: Run Unit Tests
+        run: |
+          python -m unittest discover tests -v
+
+      # Only runs if all previous steps succeeded
+      - name: Promote Challenger Model
+        run: |
+          python src/pipeline/promote_model.py
+
+      # AWS
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: latest
+
+        run: |
+          docker build \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            .
+
+      - name: Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+          IMAGE_TAG: latest
+
+        run: |
+          docker push \
+            $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
