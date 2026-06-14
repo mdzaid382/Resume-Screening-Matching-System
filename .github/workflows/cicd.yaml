@@ -87,36 +87,45 @@ jobs:
             $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
 
-  deploy:
-    needs: ci
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.0.3
-
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-
-          script: |
 
 
-              export AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}'
-              export AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}'
-              export AWS_DEFAULT_REGION='us-east-1'
+
+
+
+
+
+#=================================To Deploye on AWS EC2================================================
+  # deploy:
+  #   needs: ci
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+
+  #     - name: Deploy to EC2
+  #       uses: appleboy/ssh-action@v1.0.3
+
+  #       with:
+  #         host: ${{ secrets.EC2_HOST }}
+  #         username: ${{ secrets.EC2_USERNAME }}
+  #         key: ${{ secrets.EC2_SSH_KEY }}
+
+  #         script: |
+
+
+  #             export AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}'
+  #             export AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}'
+  #             export AWS_DEFAULT_REGION='us-east-1'
             
-              aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 009164982415.dkr.ecr.us-east-1.amazonaws.com
+  #             aws ecr get-login-password --region us-east-1 | \
+  #             docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
             
-              docker pull 009164982415.dkr.ecr.us-east-1.amazonaws.com/resume-screening:latest
+  #             docker pull 009164982415.dkr.ecr.us-east-1.amazonaws.com/resume-screening:latest
             
-              docker stop resume-screening || true
-              docker rm resume-screening || true
+  #             docker stop resume-screening || true
+  #             docker rm resume-screening || true
             
-              docker run -d \
-              --name resume-screening \
-              -p 80:8000 \
-              -e DAGSHUB_TOKEN='${{ secrets.DAGSHUB_TOKEN }}' \
-              009164982415.dkr.ecr.us-east-1.amazonaws.com/resume-screening:latest
+  #             docker run -d \
+  #             --name resume-screening \
+  #             -p 80:8000 \
+  #             -e DAGSHUB_TOKEN='${{ secrets.DAGSHUB_TOKEN }}' \
+  #             009164982415.dkr.ecr.us-east-1.amazonaws.com/resume-screening:latest

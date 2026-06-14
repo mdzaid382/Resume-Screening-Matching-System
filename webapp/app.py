@@ -2,7 +2,6 @@ from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from sentence_transformers import SentenceTransformer
 from contextlib import asynccontextmanager
 import mlflow
 import os
@@ -31,8 +30,7 @@ mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    
-    app.state.emb_model = SentenceTransformer("all-MiniLM-L6-v2")
+ 
     app.state.role_model = mlflow.pyfunc.load_model(
     f"models:/resume_screening_and_matching@challenger"
 )
@@ -89,7 +87,6 @@ async def screen_resumes(
                             )
 
         score = calculate_similarity(
-            request.app.state.emb_model,
             job_description,
             resume_text
             )
