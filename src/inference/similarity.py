@@ -17,5 +17,5 @@ def calculate_similarity(jd_text, resume_text):
         tfidf_matrix[0:1],
         tfidf_matrix[1:2]
     )[0][0]
-
-    return round(float(score) * 100, 2)
+    score = min(100, 50 + score * 100)
+    return round(float(score), 2)
